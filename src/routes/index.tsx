@@ -208,10 +208,10 @@ function DirectoryPage() {
                 transition={{ duration: 0.5 }}
               >
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#047857] dark:text-[#10B981]">
-                  PLACEMENT INTELLIGENCE
+                  PLACEMENT INTELLIGENCE PLATFORM
                 </p>
-                <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight text-slate-900 dark:text-white">
-                  Your next move starts with good research.
+                <h1 className="mt-5 text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl lg:text-[5.5rem] text-slate-900 dark:text-white">
+                  Do Your Due Diligence
                 </h1>
               </motion.div>
 
@@ -221,7 +221,7 @@ function DirectoryPage() {
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                  Explore company profiles, skill expectations, and career signals before campus placements.
+                  Go beyond standard job boards. Audit a company's financial health, psychological safety, and true work culture before you apply.
                 </p>
               </motion.div>
             </div>

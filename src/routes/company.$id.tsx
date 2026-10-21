@@ -109,9 +109,24 @@ function CompanyContent({ id, branded }: { id: string; branded: boolean }): Reac
 
   const query = useQuery({
     ...companyQueryOptions(id),
-    // Seed the header with the directory row so the shared logo can animate in instantly.
-    placeholderData: () =>
-      queryClient.getQueryData(companiesQueryOptions.queryKey)?.find((c) => getCompanyId(c) === id),
+    // Seed the header with directory cache or localStorage instantly to prevent blank flash
+    placeholderData: () => {
+      const cached = queryClient.getQueryData(companiesQueryOptions.queryKey)?.find((c) => getCompanyId(c) === id);
+      if (cached) return cached;
+
+      if (typeof window !== "undefined") {
+        try {
+          const stored = localStorage.getItem("selected-company");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed && (String(parsed.id) === String(id) || String(parsed.companyId) === String(id))) {
+              return parsed as DataRecord;
+            }
+          }
+        } catch {}
+      }
+      return undefined;
+    },
   });
 
   const notFound = query.error instanceof CompanyNotFoundError;
@@ -165,6 +180,22 @@ function CompanyContent({ id, branded }: { id: string; branded: boolean }): Reac
   }, [company]);
 
   if (notFound) return <CompanyMissing />;
+
+  if (detailsLoading && !company) {
+    return (
+      <div className={`${container} py-16 space-y-8 animate-pulse`}>
+        <div className="h-6 w-36 rounded-md bg-white/5 border border-white/10" />
+        <div className="h-36 rounded-2xl bg-white/5 border border-white/10" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="h-24 rounded-xl bg-white/5 border border-white/10" />
+          <div className="h-24 rounded-xl bg-white/5 border border-white/10" />
+          <div className="h-24 rounded-xl bg-white/5 border border-white/10" />
+          <div className="h-24 rounded-xl bg-white/5 border border-white/10" />
+        </div>
+        <div className="h-64 rounded-2xl bg-white/5 border border-white/10" />
+      </div>
+    );
+  }
 
   if (query.error && !query.isPlaceholderData) {
     const notConnected = query.error instanceof DirectoryNotConnectedError;
