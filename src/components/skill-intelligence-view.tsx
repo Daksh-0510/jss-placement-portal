@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -12,29 +12,44 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { DataRecord } from "@/lib/directory";
 import {
-  DEFAULT_12_SKILLS,
   BLOOM_TAXONOMY_LEGEND,
   CRITICALITY_LEGEND,
   proficiencyToBloom,
   scoreToCriticality,
+  transformCompanySkills,
   type SkillItem,
   type CriticalityLevel,
 } from "@/data/skillIntelligenceData";
 
 interface SkillIntelligenceViewProps {
+  company?: DataRecord | null;
   companyName?: string | undefined;
 }
 
-export function SkillIntelligenceView({ companyName = "Company" }: SkillIntelligenceViewProps) {
+export function SkillIntelligenceView({ company, companyName = "Company" }: SkillIntelligenceViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [criticalityFilter, setCriticalityFilter] = useState<"All" | CriticalityLevel>("All");
-  const [expandedSkillIds, setExpandedSkillIds] = useState<Set<string>>(
-    () => new Set(DEFAULT_12_SKILLS[0]?.id ? [DEFAULT_12_SKILLS[0].id] : [])
-  );
+
+  const companySkills = useMemo(() => {
+    return transformCompanySkills(company);
+  }, [company]);
+
+  const [expandedSkillIds, setExpandedSkillIds] = useState<Set<string>>(() => new Set());
+
+  // Automatically expand the highest-priority skill when company skills load or change
+  useEffect(() => {
+    const firstId = companySkills[0]?.id;
+    if (firstId) {
+      setExpandedSkillIds(new Set([firstId]));
+    } else {
+      setExpandedSkillIds(new Set());
+    }
+  }, [companySkills]);
 
   const filteredSkills = useMemo(() => {
-    return DEFAULT_12_SKILLS.filter((skill) => {
+    return companySkills.filter((skill) => {
       const matchesSearch =
         searchQuery.trim() === "" ||
         skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -52,7 +67,7 @@ export function SkillIntelligenceView({ companyName = "Company" }: SkillIntellig
 
       return matchesSearch && matchesCriticality;
     });
-  }, [searchQuery, criticalityFilter]);
+  }, [companySkills, searchQuery, criticalityFilter]);
 
   const toggleExpand = (id: string) => {
     setExpandedSkillIds((prev) => {
@@ -74,15 +89,51 @@ export function SkillIntelligenceView({ companyName = "Company" }: SkillIntellig
     setExpandedSkillIds(new Set());
   };
 
-  const criticalCount = DEFAULT_12_SKILLS.filter(
+  const criticalCount = companySkills.filter(
     (s) => scoreToCriticality(s.requiredScore).level === "Critical"
   ).length;
-  const importantCount = DEFAULT_12_SKILLS.filter(
+  const importantCount = companySkills.filter(
     (s) => scoreToCriticality(s.requiredScore).level === "Important"
   ).length;
-  const baselineCount = DEFAULT_12_SKILLS.filter(
+  const baselineCount = companySkills.filter(
     (s) => scoreToCriticality(s.requiredScore).level === "Baseline"
   ).length;
+
+  if (companySkills.length === 0) {
+    return (
+      <div className="space-y-10 animate-in fade-in duration-300">
+        {/* Header Summary Card */}
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white/40 dark:bg-black/30 p-6 sm:p-8 backdrop-blur-xl shadow-lg dark:shadow-2xl">
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Skill Intelligence & Roadmap Engine</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                {companyName} Capability Architecture
+              </h2>
+              <p className="max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                Granular 10-level competency benchmarks calibrated against real hiring bars.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Empty State Card */}
+        <div className="bg-white/5 border border-white/10 rounded-xl p-8 text-center shadow-xl backdrop-blur-xl">
+          <Sparkles className="mx-auto h-10 w-10 text-emerald-500/70 mb-3" />
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+            Skill Intelligence data is not yet available for this company.
+          </h3>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Competency benchmarks and roadmap calibration for {companyName} are currently being indexed.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10 animate-in fade-in duration-300">
@@ -107,7 +158,7 @@ export function SkillIntelligenceView({ companyName = "Company" }: SkillIntellig
           {/* Quick Metrics */}
           <div className="grid grid-cols-3 gap-3 shrink-0">
             <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white/60 dark:bg-black/40 p-3 text-center backdrop-blur-md">
-              <span className="text-xl sm:text-2xl font-bold tabular-nums text-slate-900 dark:text-white">12</span>
+              <span className="text-xl sm:text-2xl font-bold tabular-nums text-slate-900 dark:text-white">{companySkills.length}</span>
               <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mt-0.5">Skills</p>
             </div>
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/40 p-3 text-center backdrop-blur-md">
@@ -223,7 +274,7 @@ export function SkillIntelligenceView({ companyName = "Company" }: SkillIntellig
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             )}
           >
-            All Skills ({DEFAULT_12_SKILLS.length})
+            All Skills ({companySkills.length})
           </button>
           <button
             type="button"

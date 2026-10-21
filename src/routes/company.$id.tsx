@@ -284,7 +284,7 @@ function CompanyContent({ id, branded }: { id: string; branded: boolean }): Reac
         <ProfileBody sections={sections} loading={detailsLoading} />
       ) : (
         <div className={`${container} py-8 lg:py-12`}>
-          <SkillIntelligenceView companyName={company ? getCompanyName(company) : undefined} />
+          <SkillIntelligenceView company={company} companyName={company ? getCompanyName(company) : undefined} />
         </div>
       )}
     </>

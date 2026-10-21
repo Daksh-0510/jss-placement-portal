@@ -181,9 +181,14 @@ export function flattenSkillLevel(row: DataRecord): DataRecord {
   const s = (skill ?? {}) as DataRecord;
   const p = (level ?? {}) as DataRecord;
   return {
+    skill_set_id: rest["skill_set_id"],
     skill: s["skill_set_name"] ?? rest["skill_set_id"],
+    name: s["skill_set_name"] ?? rest["skill_set_id"],
+    short_name: s["short_name"] ?? null,
+    description: s["skill_set_description"] ?? null,
     required_level: rest["required_level"],
     proficiency: p["proficiency_name"] ?? null,
+    proficiency_code: p["proficiency_code"] ?? null,
   };
 }
 
@@ -211,7 +216,7 @@ export async function fetchCompany(id: string): Promise<DataRecord> {
       .maybeSingle(),
     supabase
       .from("company_skill_levels")
-      .select("skill_set_id, required_level, skill_set_master(skill_set_name), proficiency_levels(proficiency_name)")
+      .select("skill_set_id, required_level, skill_set_master(skill_set_name, skill_set_description, short_name), proficiency_levels(proficiency_name, proficiency_code)")
       .eq("company_id", id)
       .order("required_level", { ascending: false }),
   ]);

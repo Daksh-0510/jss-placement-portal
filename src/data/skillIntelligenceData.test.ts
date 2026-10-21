@@ -3,6 +3,7 @@ import {
   DEFAULT_12_SKILLS,
   proficiencyToBloom,
   scoreToCriticality,
+  transformCompanySkills,
 } from "./skillIntelligenceData";
 
 describe("Skill Intelligence Engine", () => {
@@ -62,5 +63,65 @@ describe("Skill Intelligence Engine", () => {
         }
       });
     }
+  });
+
+  describe("transformCompanySkills", () => {
+    it("returns empty array when company is null or undefined", () => {
+      expect(transformCompanySkills(null)).toEqual([]);
+      expect(transformCompanySkills(undefined)).toEqual([]);
+    });
+
+    it("returns empty array when company has empty skill levels", () => {
+      expect(transformCompanySkills({ company_skill_levels: [] })).toEqual([]);
+      expect(transformCompanySkills({ name: "Acme Corp" })).toEqual([]);
+    });
+
+    it("correctly maps and sorts dynamic company skill levels", () => {
+      const mockCompany = {
+        company_name: "Tech Corp",
+        company_skill_levels: [
+          {
+            skill_set_id: 1,
+            skill: "Coding",
+            required_level: 8,
+            proficiency: "Evaluate",
+            proficiency_code: "EV",
+          },
+          {
+            skill_set_id: 2,
+            skill: "Operating System",
+            required_level: 4,
+            proficiency: "Apply",
+            proficiency_code: "AP",
+          },
+          {
+            skill_set_id: 3,
+            skill: "AI Native Engineering",
+            required_level: 9,
+            proficiency: "Create",
+            proficiency_code: "CR",
+          },
+        ],
+      };
+
+      const result = transformCompanySkills(mockCompany);
+      expect(result).toHaveLength(3);
+
+      // Verify sorting descending by requiredScore: 9, 8, 4
+      expect(result[0]?.name).toBe("AI Native Engineering");
+      expect(result[0]?.requiredScore).toBe(9);
+      expect(result[0]?.category).toBe("Data Science & AI");
+      expect(result[0]?.roadmap).toHaveLength(10);
+
+      expect(result[1]?.name).toBe("Coding");
+      expect(result[1]?.requiredScore).toBe(8);
+      expect(result[1]?.category).toBe("Software Engineering");
+      expect(result[1]?.roadmap).toHaveLength(10);
+
+      expect(result[2]?.name).toBe("Operating System");
+      expect(result[2]?.requiredScore).toBe(4);
+      expect(result[2]?.category).toBe("Low-Level & OS");
+      expect(result[2]?.roadmap).toHaveLength(10);
+    });
   });
 });
