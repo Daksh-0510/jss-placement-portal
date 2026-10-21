@@ -319,6 +319,11 @@ function ProfileHeader({
   detailsLoading: boolean;
   branded: boolean;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const name = company ? getCompanyName(company) : null;
   const shortName = company ? getShortName(company) : null;
   const ceo = formatStat(findAcrossCompany(company, CEO_KEYS));
@@ -357,7 +362,7 @@ function ProfileHeader({
       />
 
       {/* Floating Previous / Next Company Navigation */}
-      {(prevCompany || nextCompany) && (
+      {mounted && (prevCompany || nextCompany) && (
         <nav
           aria-label="Company navigation"
           className="fixed z-50 pointer-events-none top-1/2 -translate-y-1/2 left-4 right-4 md:left-8 md:right-8 flex justify-between max-md:top-auto max-md:bottom-6 max-md:translate-y-0 max-md:left-4 max-md:right-4 max-md:flex max-md:justify-between"

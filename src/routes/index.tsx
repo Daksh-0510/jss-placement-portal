@@ -192,11 +192,16 @@ function DirectoryPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-border">
+      <section className="relative overflow-hidden border-b border-border bg-background">
         {/* Prominent top-center emerald ambient glow strictly below the Navbar */}
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 w-full max-w-6xl h-[26rem] rounded-full blur-[90px] opacity-90 dark:opacity-20 bg-gradient-to-b from-[#bbf7d0] via-[#86efac]/60 to-transparent dark:from-[#10b981] dark:via-[#059669]/40 dark:to-transparent"
+          className="pointer-events-none absolute left-1/2 -top-20 -translate-x-1/2 w-full max-w-6xl h-[32rem] rounded-full blur-[110px] opacity-40 dark:opacity-85 bg-gradient-to-b from-emerald-300/40 via-emerald-200/20 to-transparent dark:from-emerald-500/35 dark:via-emerald-700/20 dark:to-transparent"
+        />
+        {/* Accent glow diffusing directly behind the Metrics Card */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-[5%] top-2 w-[28rem] h-[22rem] rounded-full blur-[90px] opacity-25 dark:opacity-60 bg-gradient-to-br from-emerald-400/25 to-transparent dark:from-emerald-400/30 dark:to-transparent"
         />
 
         <div className={`relative ${container} pb-12 pt-14 sm:pt-20 lg:pb-16 lg:pt-24`}>
@@ -207,7 +212,7 @@ function DirectoryPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#047857] dark:text-[#10B981]">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#047857] dark:text-[#10B981]">
                   PLACEMENT INTELLIGENCE PLATFORM
                 </p>
                 <h1 className="mt-5 text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl lg:text-[5.5rem] text-slate-900 dark:text-white">
@@ -220,7 +225,7 @@ function DirectoryPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
-                <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                   Go beyond standard job boards. Audit a company's financial health, psychological safety, and true work culture before you apply.
                 </p>
               </motion.div>
@@ -233,7 +238,12 @@ function DirectoryPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="lg:col-span-5"
             >
-              <div className="backdrop-blur-xl bg-white/40 border border-white/60 shadow-lg dark:bg-black/20 dark:border-white/10 dark:shadow-2xl rounded-2xl p-6 relative overflow-hidden">
+              <div className="backdrop-blur-xl bg-white/50 border border-white/70 shadow-lg dark:bg-black/35 dark:border-white/10 dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] rounded-2xl p-6 relative overflow-hidden">
+                {/* Specular glass edge highlight */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 dark:via-emerald-400/30 to-transparent"
+                />
                 <div className="flex items-center justify-between pb-3 border-b border-emerald-500/10 dark:border-white/10">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">

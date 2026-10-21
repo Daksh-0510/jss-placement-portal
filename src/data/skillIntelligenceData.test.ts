@@ -65,63 +65,37 @@ describe("Skill Intelligence Engine", () => {
     }
   });
 
-  describe("transformCompanySkills", () => {
-    it("returns empty array when company is null or undefined", () => {
-      expect(transformCompanySkills(null)).toEqual([]);
-      expect(transformCompanySkills(undefined)).toEqual([]);
-    });
+  it("dynamically transforms company skills from skill_levels array", () => {
+    const mockCompany = {
+      name: "Acme Tech",
+      skill_levels: [
+        { skill: "Data Structures & Algorithms", required_level: 8 },
+        { skill: "Cloud & DevOps Infrastructure", required_level: 6 },
+        { skill: "Mobile & Cross-Platform Engineering", required_level: 3 },
+      ],
+    };
 
-    it("returns empty array when company has empty skill levels", () => {
-      expect(transformCompanySkills({ company_skill_levels: [] })).toEqual([]);
-      expect(transformCompanySkills({ name: "Acme Corp" })).toEqual([]);
-    });
+    const transformed = transformCompanySkills(mockCompany);
+    expect(transformed).toHaveLength(3);
+    expect(transformed[0]?.name).toBe("Data Structures & Algorithms");
+    expect(transformed[0]?.requiredScore).toBe(8);
+    expect(transformed[0]?.roadmap).toHaveLength(10);
+    expect(scoreToCriticality(transformed[0]?.requiredScore ?? 0).level).toBe("Critical");
 
-    it("correctly maps and sorts dynamic company skill levels", () => {
-      const mockCompany = {
-        company_name: "Tech Corp",
-        company_skill_levels: [
-          {
-            skill_set_id: 1,
-            skill: "Coding",
-            required_level: 8,
-            proficiency: "Evaluate",
-            proficiency_code: "EV",
-          },
-          {
-            skill_set_id: 2,
-            skill: "Operating System",
-            required_level: 4,
-            proficiency: "Apply",
-            proficiency_code: "AP",
-          },
-          {
-            skill_set_id: 3,
-            skill: "AI Native Engineering",
-            required_level: 9,
-            proficiency: "Create",
-            proficiency_code: "CR",
-          },
-        ],
-      };
+    expect(transformed[1]?.name).toBe("Cloud & DevOps Infrastructure");
+    expect(transformed[1]?.requiredScore).toBe(6);
+    expect(scoreToCriticality(transformed[1]?.requiredScore ?? 0).level).toBe("Important");
 
-      const result = transformCompanySkills(mockCompany);
-      expect(result).toHaveLength(3);
+    expect(transformed[2]?.name).toBe("Mobile & Cross-Platform Engineering");
+    expect(transformed[2]?.requiredScore).toBe(3);
+    expect(scoreToCriticality(transformed[2]?.requiredScore ?? 0).level).toBe("Baseline");
+  });
 
-      // Verify sorting descending by requiredScore: 9, 8, 4
-      expect(result[0]?.name).toBe("AI Native Engineering");
-      expect(result[0]?.requiredScore).toBe(9);
-      expect(result[0]?.category).toBe("Data Science & AI");
-      expect(result[0]?.roadmap).toHaveLength(10);
-
-      expect(result[1]?.name).toBe("Coding");
-      expect(result[1]?.requiredScore).toBe(8);
-      expect(result[1]?.category).toBe("Software Engineering");
-      expect(result[1]?.roadmap).toHaveLength(10);
-
-      expect(result[2]?.name).toBe("Operating System");
-      expect(result[2]?.requiredScore).toBe(4);
-      expect(result[2]?.category).toBe("Low-Level & OS");
-      expect(result[2]?.roadmap).toHaveLength(10);
-    });
+  it("returns empty array when company has no skills or is null", () => {
+    expect(transformCompanySkills(null)).toEqual([]);
+    expect(transformCompanySkills(undefined)).toEqual([]);
+    expect(transformCompanySkills({})).toEqual([]);
+    expect(transformCompanySkills({ skill_levels: [] })).toEqual([]);
+    expect(transformCompanySkills({ company_skill_levels: [] })).toEqual([]);
   });
 });

@@ -38,8 +38,13 @@ export function Wordmark({ className, textClassName }: { className?: string; tex
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [isAtDirectory, setIsAtDirectory] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const pathname = useLocation({ select: (l) => l.pathname });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -72,7 +77,7 @@ export function SiteHeader() {
     }
   };
 
-  const isDark = theme === "dark";
+  const isDark = mounted ? theme === "dark" : false;
 
   const activeLinkClass = "bg-emerald-950/60 text-emerald-400 font-medium px-3 py-1.5 rounded-lg text-sm transition-colors select-none";
   const mobileActiveLinkClass = "block rounded-lg px-3 py-2 text-base font-medium bg-emerald-950/60 text-emerald-400 transition-colors select-none";
@@ -115,17 +120,16 @@ export function SiteHeader() {
             type="button"
             onClick={toggleTheme}
             aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
-            className="w-14 h-7 rounded-full p-1 flex items-center cursor-pointer transition-colors bg-black/30 border border-white/10 shadow-inner"
+            className="w-14 h-7 rounded-full p-1 flex items-center cursor-pointer transition-colors bg-black/40 border border-emerald-500/20 shadow-inner relative"
           >
             <div
-              className={`w-5 h-5 rounded-full flex items-center justify-center shadow-md bg-[#0A261C] border border-emerald-500/20 text-slate-100 transition-transform duration-200 ease-in-out ${
-                isDark ? "translate-x-7" : "translate-x-0"
-              }`}
+              style={{ transform: isDark ? "translateX(28px)" : "translateX(0px)" }}
+              className="w-5 h-5 rounded-full flex items-center justify-center shadow-md bg-[#0A261C] border border-emerald-500/30 text-slate-100 transition-transform duration-200 ease-in-out"
             >
               {isDark ? (
-                <Moon className="h-3 w-3 text-white" aria-hidden />
+                <Moon className="h-3 w-3 text-emerald-300" aria-hidden />
               ) : (
-                <Sun className="h-3 w-3 text-white" aria-hidden />
+                <Sun className="h-3 w-3 text-emerald-400" aria-hidden />
               )}
             </div>
           </button>
